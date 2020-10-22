@@ -1,6 +1,7 @@
 {
   "name": "front",
   "version": "0.1.0",
+  "description": "cliend side of the chatterbox project",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-15",
