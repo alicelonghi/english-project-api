@@ -52,7 +52,7 @@
 
             <md-list class="md-double-line">
               <md-list-item>
-                Você não possui nenhuma usuário como favorito
+                Você não possui nenhum usuário como favorito
               </md-list-item>
             </md-list>
           </div>

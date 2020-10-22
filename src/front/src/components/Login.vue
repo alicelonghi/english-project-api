@@ -1,6 +1,6 @@
 <template>
   <div class="centered-container">
-    <md-content class="md-elevation-3">
+    <md-content v-if="hasAccount" class="md-elevation-3">
       <div class="title">
         <div class="md-body-1">
           <Logo />
@@ -8,9 +8,59 @@
         <div class="margin-title md-title">
           <span class="md-title">Chatterbox</span>
         </div>
+        <div class="margin-title md-title">
+          <span class="md-subheading">Login</span>
+        </div>
       </div>
 
       <div class="form">
+        <md-field>
+          <label>E-mail</label>
+          <md-input v-model="registerData.email" vautofocus></md-input>
+        </md-field>
+
+        <md-field md-has-password>
+          <label>Senha</label>
+          <md-input v-model="registerData.password" type="password"></md-input>
+        </md-field>
+        <a @click="auth">Esqueci minha senha</a>
+      </div>
+
+      <div class="actions md-layout md-alignment-center-space-between">
+        <md-button class=" md-raised md-primary" @click="hasAccount = false"
+          >Registrar-se</md-button
+        >
+        <md-button class="login-button  md-raised md-primary" @click="auth"
+          >Entrar</md-button
+        >
+      </div>
+
+      <div class="loading-overlay" v-if="loading">
+        <md-progress-spinner
+          md-mode="indeterminate"
+          :md-stroke="2"
+        ></md-progress-spinner>
+      </div>
+    </md-content>
+    <md-content v-else class="md-elevation-3">
+      <div class="title">
+        <div class="md-body-1">
+          <Logo />
+        </div>
+        <div class="margin-title md-title">
+          <span class="md-title">Chatterbox</span>
+        </div>
+        <div class="margin-title md-title">
+          <span class="md-subheading">Registre-se</span>
+        </div>
+      </div>
+
+      <div class="form">
+        <md-field>
+          <label>Nome</label>
+          <md-input v-model="registerData.name" vautofocus></md-input>
+        </md-field>
+
         <md-field>
           <label>E-mail</label>
           <md-input v-model="login.email" vautofocus></md-input>
@@ -20,15 +70,15 @@
           <label>Senha</label>
           <md-input v-model="login.password" type="password"></md-input>
         </md-field>
-        <a @click="auth">Esqueci minha senha</a>
+        <a>Esqueci minha senha</a>
       </div>
 
       <div class="actions md-layout md-alignment-center-space-between">
-        <md-button class="md-raised md-primary" @click="auth"
-          >Cadastre-se</md-button
+        <md-button class="md-raised md-primary" @click="hasAccount = true"
+          >Login</md-button
         >
-        <md-button class="login-button md-raised md-primary" @click="auth"
-          >Entrar</md-button
+        <md-button class="login-button md-raised md-primary" @click="register"
+          >Registrar-se</md-button
         >
       </div>
 
@@ -49,10 +99,9 @@
     data() {
       return {
         loading: false,
-        login: {
-          email: "",
-          password: "",
-        },
+        hasAccount: true,
+        login: new Object(),
+        registerData: new Object(),
       };
     },
     components: {
@@ -60,13 +109,36 @@
     },
     methods: {
       auth() {
-        // your code to login user
-        // this is only for example of loading
         this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-          this.$router.push("home");
-        }, 2000);
+
+        const data = {
+          email: this.login.email,
+          password: this.login.password,
+        };
+
+        this.$http.post("http://localhost:3000/api/login", data).then((res) => {
+          console.log(res);
+          const user = res.data.user;
+
+          if (user != null) {
+            localStorage.setItem("user", JSON.stringify(user));
+            this.loading = false;
+            this.$router.push("home");
+          }
+        });
+      },
+      register() {
+        const dataRegister = {
+          name: this.registerData.name,
+          email: this.registerData.email,
+          password: this.registerData.password,
+        };
+
+        this.$http
+          .post("http://localhost:3000/api/users", dataRegister)
+          .then((res) => {
+            console.log(res.data.user);
+          });
       },
     },
   };

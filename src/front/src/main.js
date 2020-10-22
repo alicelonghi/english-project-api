@@ -9,6 +9,10 @@ import "vue-material/dist/theme/default.css"; // This line here
 
 import WebRTC from "vue-webrtc";
 
+import axios from "axios";
+
+Vue.prototype.$http = axios;
+
 Vue.use(WebRTC);
 
 Vue.use(VueMaterial);
