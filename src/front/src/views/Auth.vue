@@ -5,7 +5,7 @@
       <md-app md-waterfall md-mode="fixed">
         <md-app-drawer md-permanent="full">
           <div class="md-toolbar md-theme-default md-elevation-0">
-            <h2>USUÁRIO: Alice Longhi</h2>
+            <h2>USUÁRIO: {{ currentUser.name }}</h2>
           </div>
           <md-toolbar
             class=" md-list md-double-line md-theme-default md-transparent"
@@ -18,10 +18,26 @@
               />
             </div>
           </md-toolbar>
-          <p>alicellonghi@gmail.com</p>
+          <p>{{ currentUser.email }}</p>
 
           <md-list>
             <div class="flex-sidebar">
+              <md-list-item>
+                <div class="md-alignment-center md-layout">
+                  <span class="md-body-2 level">status: </span>
+                  <md-switch
+                    v-model="status"
+                    @change="changeStatus"
+                    class="md-primary"
+                    ><span v-if="this.status === true">
+                      Online
+                    </span>
+                    <span v-else>
+                      Offline
+                    </span></md-switch
+                  >
+                </div>
+              </md-list-item>
               <md-list-item>
                 <div class="md-alignment-center md-layout">
                   <span class="orange600 material-icons">
@@ -67,7 +83,7 @@
                 <div class="md-layout-item">
                   <md-field>
                     <label for="movie">Selecione o nível de inglês</label>
-                    <md-select v-model="movie" name="movie" id="movie">
+                    <md-select name="movie" id="movie">
                       <md-option value="basico">Básico</md-option>
                       <md-option value="godfather">Intermediário</md-option>
                       <md-option value="godfather-ii">Avançado</md-option>
@@ -77,41 +93,19 @@
                   </md-field>
                 </div>
               </md-list-item>
-              <md-list-item>
-                <md-avatar>
-                  <img src="https://placeimg.com/40/40/people/5" alt="People" />
-                </md-avatar>
+              <div v-for="u in users" :key="u._id">
+                <md-list-item v-if="u.name">
+                  <md-avatar class="bg-orange600">
+                    <md-icon>perm_identity</md-icon>
+                  </md-avatar>
 
-                <span class="md-list-item-text">Fernanda Brunh</span>
+                  <span class="md-list-item-text">{{ u.name }}</span>
 
-                <md-button class="md-icon-button md-list-action">
-                  <md-icon class="yellow">chat_bubble</md-icon>
-                </md-button>
-              </md-list-item>
-
-              <md-list-item>
-                <md-avatar>
-                  <img src="https://placeimg.com/40/40/people/1" alt="People" />
-                </md-avatar>
-
-                <span class="md-list-item-text">Maria João Antunes</span>
-
-                <md-button class="md-icon-button md-list-action">
-                  <md-icon class="yellow">chat_bubble</md-icon>
-                </md-button>
-              </md-list-item>
-
-              <md-list-item>
-                <md-avatar>
-                  <img src="https://placeimg.com/40/40/people/6" alt="People" />
-                </md-avatar>
-
-                <span class="md-list-item-text">Carol Silva</span>
-
-                <md-button class="md-icon-button md-list-action">
-                  <md-icon class="yellow">chat_bubble</md-icon>
-                </md-button>
-              </md-list-item>
+                  <md-button class="md-icon-button md-list-action">
+                    <md-icon class="yellow">chat_bubble</md-icon>
+                  </md-button>
+                </md-list-item>
+              </div>
             </md-list>
           </div>
         </md-app-content>
@@ -121,81 +115,136 @@
 </template>
 
 <script>
-  // @ is an alias to /src
-  import Menu from "@/components/base/Menu.vue";
+// @ is an alias to /src
+import Menu from "@/components/base/Menu.vue";
 
-  export default {
-    name: "Auth",
-    components: {
-      Menu,
-    },
-    data() {
-      return {
-        avatar: "http://www.placecage.com/c/128/128",
+export default {
+  name: "Auth",
+  components: {
+    Menu,
+  },
+  data() {
+    return {
+      avatar: "http://www.placecage.com/c/128/128",
+      currentUser: "",
+      status: false,
+      users: [],
+    };
+  },
+  mounted() {
+    this.getUsers();
+    //this.$socket.emit("emit_method", data);
+    let userAuth = JSON.parse(localStorage.getItem("user"))._id;
+
+    this.$http.get(`http://localhost:3000/api/user/${userAuth}`).then((res) => {
+      console.log(res);
+      if (res.data.user != null) {
+        this.currentUser = res.data.user;
+      }
+    });
+  },
+  methods: {
+    changeStatus() {
+      let userAuth = JSON.parse(localStorage.getItem("user"))._id;
+
+      const dataStatus = {
+        status: this.status,
       };
+
+      this.$http
+        .put(`http://localhost:3000/api/users/${userAuth}`, dataStatus)
+        .then((res) => {
+          console.log(res);
+        });
+
+      this.$http
+        .get(`http://localhost:3000/api/user/${userAuth}`)
+        .then((res) => {
+          console.log(res);
+          if (res.data.user != null) {
+            this.currentUser = res.data.user;
+          }
+        });
     },
-  };
+    getUsers() {
+      this.$http.get(`http://localhost:3000/api/users`).then((res) => {
+        console.log(res);
+        this.users = res.data.Users;
+      });
+    },
+  },
+  beforeDestroy() {
+    let userAuth = JSON.parse(localStorage.getItem("user"))._id;
+
+    this.$http.get(`http://localhost:3000/api/user/${userAuth}`).then((res) => {
+      console.log(res);
+      if (res.data.user != null) {
+        this.currentUser = res.data.user;
+      }
+    });
+  },
+};
 </script>
 <style scoped>
-  .card-image {
-    margin: auto;
-    max-width: ((128px/16px) * 1em);
-  }
+.card-image {
+  margin: auto;
+  max-width: ((128px/16px) * 1em);
+}
 
-  .level {
-    margin-right: 5px;
-    font-size: 18px;
-    text-transform: uppercase;
-  }
+.level {
+  margin-right: 5px;
+  font-size: 18px;
+  text-transform: uppercase;
+}
 
-  .flex-sidebar {
-    display: flex;
-    flex-direction: column;
-    margin: 0em 3em;
-    justify-content: center;
-  }
+.flex-sidebar {
+  display: flex;
+  flex-direction: column;
+  margin: 0em 3em;
+  justify-content: center;
+}
 </style>
 <style>
-  h2 {
-    text-align: center !important;
-  }
+h2 {
+  text-align: center !important;
+}
 
-  .md-body {
-    font-size: 16px !important;
-  }
-  .orange600 {
-    color: #ffa300 !important;
-  }
+.md-body {
+  font-size: 16px !important;
+}
+.orange600 {
+  color: #ffa300 !important;
+}
 
-  .yellow {
-    color: #ffce00 !important;
-  }
-  .bg-orange600 {
-    background-color: #ffa300 !important;
-  }
-  .md-avatar.md-large {
-    min-width: 100px !important;
-    min-height: 100px !important;
-    border-radius: 100px !important;
-    font-size: 32px;
-  }
+.yellow {
+  color: #ffce00 !important;
+}
+.bg-orange600 {
+  background-color: #ffa300 !important;
+}
+.md-avatar.md-large {
+  min-width: 100px !important;
+  min-height: 100px !important;
+  border-radius: 100px !important;
+  font-size: 32px;
+}
 
-  .bold {
-    font-weight: 600 !important;
-  }
+.bold {
+  font-weight: 600 !important;
+}
 
-  p,
-  h1,
-  h2,
-  span {
-    font-family: "Roboto Condensed", sans-serif;
-  }
+p,
+h1,
+h2,
+span {
+  font-family: "Montserrat", sans-serif;
+}
 
-  .md-app-content {
-    padding: 0px !important;
-  }
+.md-app-content {
+  padding: 0px !important;
+}
 
-  .p-2 {
-    padding: 2em !important;
-  }
+.p-2 {
+  padding: 2em !important;
+}
 </style>

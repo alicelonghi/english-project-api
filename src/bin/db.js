@@ -12,8 +12,8 @@ class Controller {
     }
     async connect() {
         try {
-            await mongoose.connect(MONGO_URI, { 
-                useNewUrlParser: true 
+            await mongoose.connect(MONGO_URI, {
+                useNewUrlParser: true
             })
             console.log("connect to DB");
         } catch(err) {
@@ -23,7 +23,15 @@ class Controller {
 
     //queries
     addUser(res, data) {
+
+        // if (User.findOne( data.email ))
+        // return res.status(400).send({ error: 'User already exists!'});
+
         User.create(data, (err, newUser) => {
+
+            // if (User.findOne( data.email ))
+            // return res.status(400).send({ error: 'User already exists!'});
+
             if(err) throw err;
             res.json({
                 status: 200,
@@ -37,7 +45,7 @@ class Controller {
         User.findOne({
             $and: [
                 {email: data.email},
-                {password: data.password}                
+                {password: data.password}
             ]
         }, (err, user) => {
             if(err) throw err;
@@ -73,6 +81,20 @@ class Controller {
                 user
             })
         })
+    }
+
+    getUsers(req, res) {
+        User.find({}, function(err, Users){
+            if (err) return done(err);
+
+            if (Users) {
+                res.json({
+                    status: 200,
+                    message: 'ok',
+                    Users
+                });
+            }
+        });
     }
 
     deleteUser(res, id) {
