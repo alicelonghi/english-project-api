@@ -14,27 +14,27 @@
 </template>
 
 <script>
-  import Logo from "@/components/base/Logo.vue";
-  export default {
-    name: "Menu",
-    components: {
-      Logo,
-    },
-  };
+import Logo from "@/components/base/Logo.vue";
+export default {
+  name: "Menu",
+  components: {
+    Logo,
+  },
+};
 </script>
 
 <style scoped>
-  .menu {
-    background-color: #313131;
-    padding: 7px;
-    color: #fff;
-    display: flex;
-    font-family: "Roboto Condensed", sans-serif;
-    justify-content: space-between;
-    align-items: center;
-  }
+.menu {
+  background-color: #313131;
+  padding: 7px;
+  color: #fff;
+  display: flex;
+  font-family: "Montserrat", sans-serif;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .md-menu button {
-    color: #fff !important;
-  }
+.md-menu button {
+  color: #fff !important;
+}
 </style>

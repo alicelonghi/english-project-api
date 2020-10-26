@@ -13,6 +13,10 @@ import axios from "axios";
 
 Vue.prototype.$http = axios;
 
+import VueSwal from 'vue-swal'
+
+Vue.use(VueSwal);
+
 Vue.use(WebRTC);
 
 Vue.use(VueMaterial);

@@ -1,17 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
+const cors = require("cors");
 const app = express();
 
 
 // settings
 app.use(bodyParser.json());
-
+app.use(cors());
 const {db} = require('./db');
 
-//routes 
+//routes
 app.post('/api/users', (req, res) => {
-    let data = req.body; 
+    let data = req.body;
     db.addUser(res, data);
 });
 
@@ -31,6 +31,10 @@ app.get('/api/user/:id', (req, res) => {
     db.getUser(res, id);
 })
 
+app.get('/api/users/', (req, res) => {
+    db.getUsers(req, res);
+})
+
 app.delete('/api/user/:id', (req, res) => {
     let {id} = req.params;
     db.deleteUser(res, id);
@@ -45,7 +49,7 @@ app.delete('/api/user/:id', (req, res) => {
 //   res.send("ok");
 // });
 
-// //router 
+// //router
 
 // require("./controllers/authController")(app);
 // require("./controllers/projectController")(app);
